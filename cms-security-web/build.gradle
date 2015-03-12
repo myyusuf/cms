@@ -1,0 +1,86 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
+
+apply plugin: 'war'
+apply plugin: 'waroverlay'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+archivesBaseName = 'cms-security-web'
+group = 'id.co.oriza.cms'
+version = '1.0'
+
+ext.springGroup = 'org.springframework'
+ext.springVersion = '3.2.8.RELEASE'
+
+jar {
+	manifest {
+		attributes 'Implementation-Title': 'CMS Security Web', 'Implementation-Version': version
+	}
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencies {
+	compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+	compile "$springGroup:spring-core:$springVersion",
+			"$springGroup:spring-orm:$springVersion",
+			"$springGroup:spring-expression:$springVersion",
+			"$springGroup:spring-web:$springVersion",
+			"$springGroup:spring-webmvc:$springVersion",
+			"$springGroup:spring-test:$springVersion",
+			 "org.hibernate:hibernate-annotations:3.5.6-Final",
+			"org.hibernate:hibernate-validator:4.3.1.Final",
+			"id.co.oriza.cms:cms-security:1.0"
+			
+			
+	runtime "commons-dbcp:commons-dbcp:1.4",
+			"org.codehaus.jackson:jackson-mapper-asl:1.9.10",
+			"javassist:javassist:3.12.1.GA",
+			"mysql:mysql-connector-java:5.1.6",
+			"org.slf4j:slf4j-api:1.7.7",
+			"org.slf4j:slf4j-log4j12:1.7.7",
+			"log4j:log4j:1.2.17",
+			"aspectj:aspectjweaver:1.5.2",
+			"id.co.oriza.cms:cms-base-web:1.0@war"
+			
+	testCompile group: 'junit', name: 'junit', version: '4.+'
+	
+	providedCompile 'javax.servlet:servlet-api:2.5'
+	
+}
+
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath "org.scaldingspoon.gradle:gradle-waroverlay-plugin:0.9.3"
+	}
+}
+
+uploadArchives {
+	repositories {
+	   flatDir {
+		   dirs 'repos'
+	   }
+	}
+}
+
+task copyWebFiles(type: Copy) {
+	from 'src/main/webapp'
+	into file('file:/E:/Installers/servers/jboss/jboss-eap-6.2/standalone/deployments/cms-security-web-1.0.war')
+	exclude 'WEB-INF'
+}
+
+task copyClassFiles(type: Copy) {
+	from 'build/classes/main'
+	into file('file:/E:/Installers/servers/jboss/jboss-eap-6.2/standalone/deployments/cms-security-web-1.0.war/WEB-INF/classes')
+	exclude 'WEB-INF'
+}
